@@ -1,16 +1,17 @@
 import React from 'react'
-import { Animated, Easing, StyleSheet, Text, View, TouchableWithoutFeedback } from 'react-native'
+import { Animated, Easing, StyleSheet, Text, View, TouchableHighlight, TouchableWithoutFeedback } from 'react-native'
 import PhotoGallery from './PhotoGallery'
 import { LinearGradient } from 'expo'
 
 const Item = class Item extends React.Component {
   state = {
     opacity: new Animated.Value(1),
+    scale: new Animated.Value(0),
   }
   componentWillMount() {
     bus.addListener('storySelected', _ => {
-      // build-out titles
-      this.state.opacity.setValue(0)
+      // build-out titles, yield to animations...
+      setTimeout(_ => this.state.opacity.setValue(0), 250)
     })
     bus.addListener('photoGalleryClosed', photoId => {
       // build-in titles
@@ -26,9 +27,21 @@ const Item = class Item extends React.Component {
   }
 
   render() {
-    const { item, onPhotoOpen } = this.props
-    return (<TouchableWithoutFeedback onPress={() => onPhotoOpen(item)}>
-      <View>
+    const
+      { item, onPhotoOpen } = this.props,
+      scale = this.state.scale.interpolate({
+        inputRange: [0, 0.00001, 0.8, 1],
+        outputRange: [1, .96, 1.03, 1],
+      })
+    return (<TouchableHighlight onPress={() => {
+      Animated.timing(this.state.scale, {
+        toValue: 1,
+        duration: 250,
+        easing: Easing.easeInExpo,
+        useNativeDriver: true
+      }).start(_ => this.state.scale.setValue(0))
+      onPhotoOpen(item)}}>
+      <Animated.View style={{transform: [{scale}]}}>
         <PhotoGallery.Photo
           photo={item}
           style={{
@@ -44,8 +57,8 @@ const Item = class Item extends React.Component {
             </View>
           </LinearGradient>
         </Animated.View>
-      </View>
-    </TouchableWithoutFeedback>)
+      </Animated.View>
+    </TouchableHighlight>)
   }
 }
 

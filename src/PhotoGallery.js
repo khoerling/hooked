@@ -44,6 +44,7 @@ class PhotoGalleryPhoto extends React.Component {
 export default class PhotoGallery extends React.Component {
   static Photo = PhotoGalleryPhoto
 
+  initialLoad = true
   state = {
     photo: null,
     openProgress: new Animated.Value(0),
@@ -59,7 +60,7 @@ export default class PhotoGallery extends React.Component {
   }
 
   componentWillMount() {
-    bus.addListener('storySelected', photo => {
+    bus.addListener('storySelected', ([photo, cb]) => {
       this.setState({photo})
     })
   }
@@ -73,10 +74,29 @@ export default class PhotoGallery extends React.Component {
   }
 
   open = photo => {
-    if (!isDroid) Haptic.selection()
-    this.setState({ photo, isAnimating: false })
-    this.state.openProgress.setValue(1) // immediately open
-    bus.emit('storySelected', photo)    // photo is the full story
+    const openFn = _ => {
+      this._imageOpacitySetters[photo.id](
+        this.state.openProgress.interpolate({
+          inputRange: [0.005, 0.9],
+          outputRange: [1, 0]
+        })
+      )
+      this.setState({ photo, isAnimating: true }, () => {
+        Animated.timing(this.state.openProgress, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true
+        }).start(() => {
+          this.setState({ isAnimating: false })
+        })
+      })
+    }
+    if (this.initialLoad) {
+      this.initialLoad = false
+      openFn()
+    }
+    if (!isDroid) Haptic.selection() // immediate feedback
+    bus.emit('storySelected', [photo, openFn]) // photo is the full story
   }
 
   close = photoId => {
@@ -84,8 +104,8 @@ export default class PhotoGallery extends React.Component {
       bus.emit('photoGalleryClosed', photoId)
       Animated.timing(this.state.openProgress, {
         toValue: 0,
-        duration: 300,
-        easing: Easing.easeInExpo,
+        duration: 400,
+        easing: Easing.out(Easing.cubic),
         useNativeDriver: true
       }).start(() => {
         this._imageOpacitySetters[photoId](1)

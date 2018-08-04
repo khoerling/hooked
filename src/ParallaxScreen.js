@@ -63,13 +63,15 @@ export default class App extends React.Component {
 
   async componentWillMount() {
     bus.addListener('photoGalleryClosed', _ => setTimeout(_ => this.closeDrawer(), this.animationTimeout))
-    bus.addListener('storySelected', async story => {
-      const scrollToIndex = data.findIndex(d => d.id === story.id)
+    bus.addListener('storySelected', async ([story, fn]) => {
+      const
+        scrollToIndex = data.findIndex(d => d.id === story.id),
+        cb = fn || (_ => {})
       this.setState({
         // restore read-point & index
         scrollToIndex,
         messageIndex: await this.messageIndex(scrollToIndex)
-      })
+      }, _ => {setTimeout(cb, 1)})
     })
   }
 
@@ -119,7 +121,7 @@ export default class App extends React.Component {
       setTimeout(_ => {
         // update index and bounce bottom-drawer teaser in
         this.setState({scrollToIndex})
-        bus.emit('storySelected', this.story())
+        bus.emit('storySelected', [this.story(), null])
         Animated.spring(this.state.scale, {
           toValue: 1,
           velocity: 1.5,
@@ -150,8 +152,6 @@ export default class App extends React.Component {
     const
       story = this.story(),
       messages =
-        this.state.isDrawerOpen
-          ?
             []
             .concat({from: 'narration'})
             .concat({from: 'narration'})
@@ -160,8 +160,6 @@ export default class App extends React.Component {
                 .messages
                 .slice(0, this.state.messageIndex)
                 .reverse())
-          : []
-            .concat(story.messages.slice(0, 20))
     return (
       <View style={{flex: 1}}>
         <ParallaxSwiper
@@ -231,7 +229,7 @@ export default class App extends React.Component {
             onStartDrag={_ => this.onStartDrag()}
             onStopDrag={_ => this.onStopDrag()}
             headerHeight={90}
-            teaserHeight={85}
+            teaserHeight={45}
             itemHeight={130}
             headerIcon={'md-arrow-back'}
             data={messages}
