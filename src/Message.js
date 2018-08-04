@@ -65,10 +65,11 @@ export default class Message extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     borderRadius: 10,
     backgroundColor: 'rgba(255,255,255,.94)',
     padding: 8,
+    paddingHorizontal: 35,
+    paddingRight: 40,
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
     marginTop: 10,
@@ -109,6 +110,10 @@ const styles = StyleSheet.create({
   },
   bodyRight: {
     fontSize: 17,
+    textAlign: 'right',
+  },
+  containerRight: {
+    alignItems: 'flex-end',
   },
   body: {
     fontSize: 18,
