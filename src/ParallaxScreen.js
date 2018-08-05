@@ -151,6 +151,10 @@ export default class App extends React.Component {
   render() {
     const
       story = this.story(),
+      translateY = this.state.scale.interpolate({
+        inputRange: [0, .0001, .9, 1],
+        outputRange: [0, -20, 35, 0],
+      }),
       messages =
             []
             .concat({from: 'narration'})
@@ -218,7 +222,7 @@ export default class App extends React.Component {
           </ParallaxSwiper>
         <Animated.View
           style={[
-            {transform: [{scale: this.state.scale}]},
+            {transform: [{translateY}]},
             this.state.isOnTop ? {...StyleSheet.absoluteFillObject} : {...StyleSheet.absoluteFillObject, top: height - 100}]}>
           <Drawer
             onPress={_ => this.onPress()}
@@ -229,7 +233,7 @@ export default class App extends React.Component {
             onStartDrag={_ => this.onStartDrag()}
             onStopDrag={_ => this.onStopDrag()}
             headerHeight={0}
-            teaserHeight={163}
+            teaserHeight={145}
             itemHeight={130}
             headerIcon={'md-arrow-back'}
             data={messages}
