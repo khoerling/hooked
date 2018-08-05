@@ -84,7 +84,7 @@ export default class DetailScreen extends React.Component {
               style={styles.closeButton}
             >
               <View>
-                <Text style={styles.closeText}>X</Text>
+                <Image style={styles.image} source={require('../assets/x.png')} />
               </View>
             </TouchableOpacity>
           </Animated.View>
@@ -106,18 +106,12 @@ const styles = StyleSheet.create({
     fontSize: 14
   },
   body: { flex: 1, },
-  closeText: { fontSize: 17, fontWeight: 'bold', color: '#eee', backgroundColor: 'transparent' },
   closeButton: {
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    marginTop: 22,
-    marginRight: 3,
-    borderWidth: 1,
-    borderColor: 'white',
-    padding: 10,
-    paddingTop: 5,
-    paddingBottom: 5,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: 'rgba(255,255,255,.7)',
-    borderRadius: 100
+    marginTop: 10,
+    marginRight: -10,
+  },
+  image: {
+    height: 60,
+    width: 60,
   }
 })
