@@ -7,7 +7,7 @@ import { processImages, buildRows, normalizeRows } from './src/utils'
 import PhotoGallery from './src/PhotoGallery'
 import GridItem from './src/GridItem'
 import EventEmitter from 'EventEmitter'
-import { Font } from 'expo'
+import { AppLoading, Font } from 'expo'
 
 const
   { width, height } = Dimensions.get("window"),
@@ -19,24 +19,31 @@ const
 Object.assign(global, {cw, js, bus})
 
 // preload fonts
-Font.loadAsync({
-  'iowan': require('./assets/fonts/IowanOldStBTRoman.ttf'),
+const processedImages = processImages(PHOTOS)
+let rows = buildRows(processedImages, width)
+rows = normalizeRows(rows, width)
+
+const ds = new ListView.DataSource({
+  rowHasChanged: (r1, r2) => r1 !== r2
 })
 
+
+// <App>
+// ---------
 export default class App extends Component {
-  componentWillMount() {
-    const processedImages = processImages(PHOTOS)
-    let rows = buildRows(processedImages, width)
-    rows = normalizeRows(rows, width)
+  state = {
+    dataSource: ds.cloneWithRows(rows),
+    isReady: false,
+  }
 
-    const ds = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1 !== r2
-    })
-
-    this.setState({
-      dataSource: ds.cloneWithRows(rows)
-    })
-
+  async _cacheResourcesAsync() {
+    const tasks = [
+      // load fonts
+      await Font.loadAsync({
+        'iowan': require('./assets/fonts/IowanOldStBTRoman.ttf'),
+      }),
+    ]
+    return Promise.all(tasks)
   }
 
   renderRow = (onPhotoOpen, row) =>
@@ -52,6 +59,16 @@ export default class App extends Component {
     </View>
 
   render() {
+    if (!this.state.isReady) {
+      return (
+        <AppLoading
+          startAsync={this._cacheResourcesAsync}
+          onFinish={() => this.setState({ isReady: true })}
+          onError={console.warn}
+          />
+      )
+    }
+
     return (
       <View style={{flex: 1, backgroundColor: '#000'}}>
         <PhotoGallery
