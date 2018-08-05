@@ -7,6 +7,7 @@ import { processImages, buildRows, normalizeRows } from './src/utils'
 import PhotoGallery from './src/PhotoGallery'
 import GridItem from './src/GridItem'
 import EventEmitter from 'EventEmitter'
+import { Font } from 'expo'
 
 const
   { width, height } = Dimensions.get("window"),
@@ -16,6 +17,11 @@ const
   isDroid = Platform.OS !== 'ios'
 
 Object.assign(global, {cw, js, bus})
+
+// preload fonts
+Font.loadAsync({
+  'iowan': require('./assets/fonts/IowanOldStBTRoman.ttf'),
+})
 
 export default class App extends Component {
   componentWillMount() {
@@ -30,6 +36,7 @@ export default class App extends Component {
     this.setState({
       dataSource: ds.cloneWithRows(rows)
     })
+
   }
 
   renderRow = (onPhotoOpen, row) =>

@@ -69,6 +69,7 @@ const styles = StyleSheet.create({
     right: 0,
   },
   h1: {
+    fontFamily: 'iowan',
     fontSize: 25,
     lineHeight: 24,
     letterSpacing: -1,
@@ -78,6 +79,7 @@ const styles = StyleSheet.create({
     paddingRight: 5,
   },
   h2: {
+    fontFamily: 'iowan',
     fontSize: 13,
     lineHeight: 15,
     color: '#fff',

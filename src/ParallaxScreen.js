@@ -276,6 +276,7 @@ const styles = StyleSheet.create({
     right: 0,
   },
   foregroundText: {
+    fontFamily: 'iowan',
     flex: 1,
     flexDirection: 'row',
     marginRight: 25,
@@ -286,14 +287,17 @@ const styles = StyleSheet.create({
     color: "white"
   },
   abstractText: {
+    fontFamily: 'iowan',
     fontSize: 13,
     fontWeight: '400',
     paddingRight: 25,
     color: 'rgba(255,255,255,.85)',
   },
   authorText: {
+    fontFamily: 'iowan',
     fontSize: 14,
-    marginTop: 5,
+    marginTop: 0,
+    marginBottom: 3,
     fontWeight: "700",
     color: 'rgba(255,255,255,.85)',
   },
