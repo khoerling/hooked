@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   body: { flex: 1, },
   closeButton: {
     marginTop: 10,
-    marginRight: -10,
+    marginRight: -23,
   },
   image: {
     height: 60,

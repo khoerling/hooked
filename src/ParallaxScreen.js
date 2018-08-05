@@ -228,8 +228,8 @@ export default class App extends React.Component {
             onClose={_ => this.closeDrawer()}
             onStartDrag={_ => this.onStartDrag()}
             onStopDrag={_ => this.onStopDrag()}
-            headerHeight={90}
-            teaserHeight={45}
+            headerHeight={0}
+            teaserHeight={163}
             itemHeight={130}
             headerIcon={'md-arrow-back'}
             data={messages}
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     position: 'absolute',
     bottom: 0,
-    paddingBottom: 90,
+    paddingBottom: 30,
     paddingTop: 15,
     paddingLeft: 25,
     left: 0,
