@@ -51,7 +51,7 @@ export default class App extends React.Component {
     ]
   })
 
-  story = _ => data[this.state.scrollToIndex]
+  story = s => data[s || this.state.scrollToIndex]
   saveMessageIndex = _ => set(`msgs:${this.state.scrollToIndex}`, this.state.messageIndex)
   messageIndex = async scrollToIndex => (await get(`msgs:${scrollToIndex || this.state.scrollToIndex}`)) || 1
   isLastMessage = (story, index) => index === 2
@@ -70,7 +70,7 @@ export default class App extends React.Component {
       this.setState({
         // restore read-point & index
         scrollToIndex,
-        messageIndex: await this.messageIndex(scrollToIndex)
+        messageIndex: await this.messageIndex(scrollToIndex),
       }, _ => {setTimeout(cb, 1)})
     })
   }
@@ -122,15 +122,16 @@ export default class App extends React.Component {
     this._endTimer =
       setTimeout(_ => {
         // update index and bounce bottom-drawer teaser in
-        this.setState({scrollToIndex})
-        bus.emit('storySelected', [this.story(), null])
-        Animated.spring(this.state.scale, {
-          toValue: 1,
-          velocity: 1.5,
-          bounciness: .1,
-        }).start()
-        if (!isDroid) Haptic.impact(Haptic.ImpactStyles.Light)
-      }, 150)
+        this.setState({scrollToIndex}, _ => {
+          bus.emit('storySelected', [this.story(scrollToIndex), null])
+          Animated.spring(this.state.scale, {
+            toValue: 1,
+            velocity: 1.5,
+            bounciness: .1,
+          }).start()
+          if (!isDroid) Haptic.impact(Haptic.ImpactStyles.Light)
+        })
+      }, 200)
   }
   async onPress(params) {
     if (!this.state.isDrawerOpen) {
