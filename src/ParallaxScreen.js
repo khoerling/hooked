@@ -18,7 +18,7 @@ export default class App extends React.Component {
   swipeAnimatedValue = new Animated.Value(0)
   state = {
     buildInLastMessage: new Animated.Value(1),
-    scale: new Animated.Value(1),
+    translateY: new Animated.Value(0),
     isDrawerOpen: false,
     scrollToIndex: this.props.scrollToIndex || 0,
     messageIndex: 1,
@@ -113,26 +113,26 @@ export default class App extends React.Component {
 
   onScrollBegin(scrollToIndex) {
     if (this._endTimer) clearTimeout(this._endTimer)
+    Animated.timing(this.state.translateY, {
+      useNativeDriver: true,
+      toValue: 20,
+      duration: 175,
+    }).start()
   }
+
   onScrollEnd(scrollToIndex) {
     if (this._endTimer) clearTimeout(this._endTimer)
-    if (scrollToIndex === this.state.scrollToIndex) return false
-    if (scrollToIndex === this.lastScrollToIndex) return false
-    this.lastScrollToIndex = scrollToIndex
     this._endTimer =
       setTimeout(_ => {
         // update index and bounce bottom-drawer teaser in
         this.setState({scrollToIndex}, _ => {
           bus.emit('storySelected', [this.story(scrollToIndex), null])
-          Animated.spring(this.state.scale, {
-            toValue: 1,
-            velocity: 1.5,
-            bounciness: .1,
-          }).start()
+          this.state.translateY.setValue(0)
           if (!isDroid) Haptic.impact(Haptic.ImpactStyles.Light)
         })
       }, 200)
   }
+
   async onPress(params) {
     if (!this.state.isDrawerOpen) {
       this.openDrawer()
@@ -154,10 +154,6 @@ export default class App extends React.Component {
   render() {
     const
       story = this.story(),
-      translateY = this.state.scale.interpolate({
-        inputRange: [0, .0001, .9, 1],
-        outputRange: [0, -20, 35, 0],
-      }),
       messages =
             []
             .concat({from: 'narration'})
@@ -225,7 +221,7 @@ export default class App extends React.Component {
           </ParallaxSwiper>
         <Animated.View
           style={[
-            {transform: [{translateY}]},
+            {transform: [{translateY: this.state.translateY}]},
             this.state.isOnTop ? {...StyleSheet.absoluteFillObject} : {...StyleSheet.absoluteFillObject, top: height - 100}]}>
           <Drawer
             onPress={_ => this.onPress()}

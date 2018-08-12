@@ -15,12 +15,14 @@ const Item = class Item extends React.Component {
     })
     bus.addListener('photoGalleryClosed', photoId => {
       // build-in titles
+      setTimeout(_ => {
       Animated.timing(this.state.opacity, {
         toValue: 1,
-        duration: 650,
+        duration: 250,
         easing: Easing.easeOutExpo,
         useNativeDriver: true
       }).start()
+      }, 100)
     })
   }
 
@@ -34,7 +36,7 @@ const Item = class Item extends React.Component {
     return (<TouchableHighlight onPress={() => {
       Animated.timing(this.state.scale, {
         toValue: 1,
-        duration: 250,
+        duration: 150,
         easing: Easing.easeInExpo,
         useNativeDriver: true
       }).start(_ => this.state.scale.setValue(0))

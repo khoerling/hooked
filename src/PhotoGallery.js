@@ -104,8 +104,8 @@ export default class PhotoGallery extends React.Component {
       bus.emit('photoGalleryClosed', photoId)
       Animated.timing(this.state.openProgress, {
         toValue: 0,
-        duration: 400,
-        easing: Easing.out(Easing.cubic),
+        duration: 300,
+        easing: Easing.easeOutCubic,
         useNativeDriver: true
       }).start(() => {
         this._imageOpacitySetters[photoId](1)

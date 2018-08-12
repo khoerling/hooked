@@ -9,6 +9,8 @@ import {
   TouchableOpacity,
   Animated
 } from 'react-native'
+
+import CollapsibleNavBar from './CollapsibleNavBar'
 import ParallaxScreen from './ParallaxScreen'
 import PHOTOS from './data'
 
