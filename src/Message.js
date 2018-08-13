@@ -10,6 +10,8 @@ import {
   Platform,
 } from 'react-native'
 
+const isDroid = Platform.OS !== 'ios'
+
 export default class Message extends React.Component {
   render() {
     const {item, theme, style, onPress} = this.props
@@ -17,7 +19,7 @@ export default class Message extends React.Component {
     return (
       <TouchableWithoutFeedback onPress={_ => onPress()}>
         {item.from === 'narration'
-          ? <Animated.View style={[{flex: 1, justifyContent: 'center'}, style ? style : null]}>
+          ? <Animated.View style={[{flex: 1, marginHorizontal: 30, justifyContent: 'center'}, style ? style : null]}>
               <Text
                 selectable={true}
                 style={[
@@ -73,15 +75,14 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
     marginTop: 10,
-    marginHorizontal: 7,
+    marginHorizontal: 35,
+    flex: .7,
   },
   abstract: {
-    // backgroundColor: 'rgba(255,255,255,.3)',
     backgroundColor: 'transparent',
     minHeight: 90,
   },
   darkAbstract: {
-    // backgroundColor: 'rgba(250,250,250,.5)',
     backgroundColor: 'transparent',
     minHeight: 90,
   },
