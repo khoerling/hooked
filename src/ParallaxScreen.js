@@ -1,19 +1,26 @@
 import React from 'react'
 import Drawer from 'react-native-bottom-drawer'
-import { StatusBar, Platform, PanResponder, TouchableWithoutFeedback, Animated, StyleSheet, Image, Text, View, Dimensions } from 'react-native'
+import { Easing, StatusBar, Platform, PanResponder, TouchableWithoutFeedback, Animated, StyleSheet, Image, Text, View, Dimensions } from 'react-native'
 import { ParallaxSwiper, ParallaxSwiperPage } from "react-native-parallax-swiper"
 import { Haptic } from 'expo'
-import { BlurView } from 'expo'
+import { LinearGradient } from 'expo'
 
+import Icon from 'react-native-vector-icons/Ionicons'
+import CollapsibleNavBar from './CollapsibleNavBar'
 import data from './data'
 import Message from './Message'
 import { get, set } from './storage'
 
 const
   { width, height } = Dimensions.get("window"),
-  isDroid = Platform.OS !== 'ios'
+  isDroid = Platform.OS !== 'ios',
+  gradients = {
+    light: ['transparent', 'rgba(0,0,0,.2)', 'rgba(0,0,0,.5)', 'rgba(0,0,0,.79)'],
+    dark: ['transparent', 'rgba(255,255,255,.2)', 'rgba(255,255,255,.5)', 'rgba(255,255,255,.79)']
+  }
 
 export default class App extends React.Component {
+  _shouldRender = true
   animationTimeout = 100
   swipeAnimatedValue = new Animated.Value(0)
   state = {
@@ -64,6 +71,7 @@ export default class App extends React.Component {
   async componentWillMount() {
     bus.addListener('photoGalleryClosed', _ => setTimeout(_ => this.closeDrawer(), this.animationTimeout))
     bus.addListener('storySelected', async ([story, fn]) => {
+      if (!this._shouldRender) return // guard
       const
         scrollToIndex = data.findIndex(d => d.id === story.id),
         cb = fn || (_ => {})
@@ -115,7 +123,8 @@ export default class App extends React.Component {
     if (this._endTimer) clearTimeout(this._endTimer)
     Animated.timing(this.state.translateY, {
       useNativeDriver: true,
-      toValue: 20,
+      easing: Easing.easeOutCubic,
+      toValue: 50,
       duration: 175,
     }).start()
   }
@@ -126,11 +135,14 @@ export default class App extends React.Component {
       setTimeout(_ => {
         // update index and bounce bottom-drawer teaser in
         this.setState({scrollToIndex}, _ => {
+          this._shouldRender = false
           bus.emit('storySelected', [this.story(scrollToIndex), null])
+          if (this._timer) clearTimeout(this._timer)
+          this._timer = setTimeout(_ => this._shouldRender = true, 200)
           this.state.translateY.setValue(0)
           if (!isDroid) Haptic.impact(Haptic.ImpactStyles.Light)
         })
-      }, 200)
+      }, 400)
   }
 
   async onPress(params) {
@@ -188,7 +200,7 @@ export default class App extends React.Component {
                     source={{ uri: story.source.uri }} />
                 }
                 ForegroundComponent={
-                  <BlurView intensity={65} key={story.id} style={[styles.foregroundTextContainer, {opacity: this.state.isDrawerOpen ? 0 : 1}]}>
+                  <LinearGradient colors={gradients[story.theme || 'light']} style={[styles.foregroundTextContainer, {opacity: this.state.isDrawerOpen ? 0 : 1}]}>
                     {this.state.isDrawerOpen
                       ? null
                       : <Animated.View
@@ -214,7 +226,7 @@ export default class App extends React.Component {
                           </TouchableWithoutFeedback>
                         </Animated.View>
                     }
-                  </BlurView>
+                  </LinearGradient>
                 }
               />
             ))}
@@ -223,6 +235,9 @@ export default class App extends React.Component {
           style={[
             {transform: [{translateY: this.state.translateY}]},
             this.state.isOnTop ? {...StyleSheet.absoluteFillObject} : {...StyleSheet.absoluteFillObject, top: height - 100}]}>
+          <View style={[styles.headerIcon, this.state.isOnTop ? {opacity: 0} : null]}>
+            <Icon name={'ios-arrow-down'} size={35} color="red" />
+          </View>
           <Drawer
             onPress={_ => this.onPress()}
             ref={r => this._drawer = r}
@@ -232,7 +247,7 @@ export default class App extends React.Component {
             onStartDrag={_ => this.onStartDrag()}
             onStopDrag={_ => this.onStopDrag()}
             headerHeight={0}
-            teaserHeight={145}
+            teaserHeight={135}
             itemHeight={130}
             headerIcon={'md-arrow-back'}
             data={messages}
@@ -259,6 +274,12 @@ const styles = StyleSheet.create({
     width,
     height,
   },
+  headerIcon: {
+    flex: 1,
+    alignSelf: 'center',
+    paddingTop: 30,
+    marginVertical: 20,
+  },
   foregroundTextContainer: {
     flex: 1,
     alignItems: "flex-start",
@@ -266,17 +287,18 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     position: 'absolute',
     bottom: 0,
-    paddingBottom: 30,
-    paddingTop: 15,
-    paddingLeft: 25,
+    paddingBottom: 60,
+    paddingTop: 30,
     left: 0,
     right: 0,
   },
   foregroundText: {
     fontFamily: 'iowan',
+    alignSelf: 'center',
+    textAlign: 'center',
+    paddingHorizontal: 12,
     flex: 1,
     flexDirection: 'row',
-    marginRight: 25,
     fontSize: 34,
     lineHeight: 32,
     fontWeight: "700",
@@ -284,17 +306,21 @@ const styles = StyleSheet.create({
     color: "white"
   },
   abstractText: {
-    fontFamily: 'iowan',
-    fontSize: 13,
+    fontFamily: isDroid ? 'serif' : 'Times New Roman',
+    alignSelf: 'center',
+    textAlign: 'justify',
+    paddingHorizontal: 8,
+    fontSize: 14,
     fontWeight: '400',
-    paddingRight: 25,
     color: 'rgba(255,255,255,.85)',
   },
   authorText: {
     fontFamily: 'iowan',
+    textAlign: 'center',
+    alignSelf: 'center',
     fontSize: 14,
     marginTop: 0,
-    marginBottom: 3,
+    marginBottom: 7,
     fontWeight: "700",
     color: 'rgba(255,255,255,.85)',
   },

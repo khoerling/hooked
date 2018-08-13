@@ -10,7 +10,6 @@ import {
   Animated
 } from 'react-native'
 
-import CollapsibleNavBar from './CollapsibleNavBar'
 import ParallaxScreen from './ParallaxScreen'
 import PHOTOS from './data'
 
@@ -110,7 +109,7 @@ const styles = StyleSheet.create({
   body: { flex: 1, },
   closeButton: {
     marginTop: 10,
-    marginRight: -23,
+    marginRight: -26,
   },
   image: {
     height: 60,
