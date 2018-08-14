@@ -58,6 +58,12 @@ export default class App extends Component {
       )}
     </View>
 
+  componentDidMount() {
+    // bus.addListener('photoGalleryClosed', ({photoId, index}) => {
+    //   this.listView.scrollTo({ y: Math.floor(300 * (index / 2)), animated: false });
+    // })
+  }
+
   render() {
     if (!this.state.isReady) {
       return (
@@ -68,12 +74,12 @@ export default class App extends Component {
           />
       )
     }
-
     return (
       <View style={{flex: 1, backgroundColor: '#000'}}>
         <PhotoGallery
           renderContent={({ onPhotoOpen }) =>
             <ListView
+              ref={(ref) => this.listView = ref}
               dataSource={this.state.dataSource}
               renderRow={this.renderRow.bind(this, onPhotoOpen)}
             />}

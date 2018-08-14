@@ -13,15 +13,15 @@ const Item = class Item extends React.Component {
       // build-out titles, yield to animations...
       setTimeout(_ => this.state.opacity.setValue(0), 250)
     })
-    bus.addListener('photoGalleryClosed', photoId => {
+    bus.addListener('photoGalleryClosed', _ => {
       // build-in titles
       setTimeout(_ => {
-      Animated.timing(this.state.opacity, {
-        toValue: 1,
-        duration: 250,
-        easing: Easing.easeOutExpo,
-        useNativeDriver: true
-      }).start()
+        Animated.timing(this.state.opacity, {
+          toValue: 1,
+          duration: 250,
+          easing: Easing.easeOutExpo,
+          useNativeDriver: true
+        }).start()
       }, 100)
     })
   }

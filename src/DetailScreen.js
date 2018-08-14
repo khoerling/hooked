@@ -81,7 +81,7 @@ export default class DetailScreen extends React.Component {
           >
             <TouchableOpacity
               hitSlop={{ top: 20, left: 20, right: 20, bottom: 20 }}
-              onPress={() => onClose(localPhoto.id)}
+              onPress={() => onClose(localPhoto.id, this.state.scrollToIndex)}
               style={styles.closeButton}
             >
               <View>

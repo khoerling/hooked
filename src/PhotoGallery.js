@@ -99,9 +99,9 @@ export default class PhotoGallery extends React.Component {
     bus.emit('storySelected', [photo, openFn]) // photo is the full story
   }
 
-  close = photoId => {
+  close = (photoId, index) => {
+    bus.emit('photoGalleryClosed', {photoId, index})
     this.setState({ photo: null, isAnimating: true }, () => {
-      bus.emit('photoGalleryClosed', photoId)
       Animated.timing(this.state.openProgress, {
         toValue: 0,
         duration: 300,
