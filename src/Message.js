@@ -75,7 +75,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
     marginTop: 10,
-    marginHorizontal: 35,
+    marginHorizontal: 5,
+    maxWidth: '75%',
     flex: .7,
   },
   abstract: {
@@ -114,6 +115,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   containerRight: {
+    alignSelf: 'flex-end',
     alignItems: 'flex-end',
   },
   body: {
