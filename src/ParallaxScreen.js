@@ -25,6 +25,7 @@ export default class App extends React.Component {
   animationTimeout = 300
   swipeAnimatedValue = new Animated.Value(0)
   state = {
+    storyOpacity: new Animated.Value(1),
     buildInLastMessage: new Animated.Value(1),
     translateY: new Animated.Value(0),
     isDrawerOpen: false,
@@ -79,6 +80,7 @@ export default class App extends React.Component {
     })
     bus.addListener('storySelected', async ([story, fn]) => {
       if (!this._shouldRender) return // guard
+      this.state.storyOpacity.setValue(0)
       const
         scrollToIndex = data.findIndex(d => d.id === story.id),
         cb = fn || (_ => {})
@@ -86,7 +88,15 @@ export default class App extends React.Component {
         // restore read-point & index
         scrollToIndex,
         messageIndex: await this.messageIndex(scrollToIndex),
-      }, _ => {setTimeout(cb, 1)})
+      }, _ => {
+        cb()
+        Animated.timing(this.state.storyOpacity, {
+          useNativeDriver: true,
+          easing: Easing.easeOutCubic,
+          toValue: 1,
+          duration: 250,
+        }).start()
+      })
     })
   }
 
@@ -103,7 +113,9 @@ export default class App extends React.Component {
   }
 
   closeDrawer() {
-    this.setState({isDrawerOpen: false})
+    this.setState(
+      {isDrawerOpen: false},
+      _ => this.state.storyOpacity.setValue(1))
     if (this._close) { // guard
       clearTimeout(this._close)
       this._close = null
@@ -225,11 +237,11 @@ export default class App extends React.Component {
                             },
                           ]}>
                           <TouchableWithoutFeedback onPress={_ => this.openDrawer()}>
-                            <View>
+                            <Animated.View style={{opacity: this.state.storyOpacity}}>
                               <Text style={[styles.foregroundText, story.theme ? styles[story.theme] : null]}>{story.title.toUpperCase()}</Text>
                               <Text style={[styles.authorText, story.theme ? styles[story.theme] : null]}>{story.postedBy.toUpperCase()}</Text>
                               <Text style={[styles.abstractText, story.theme ? styles[story.theme] : null]}>{story.abstract}</Text>
-                            </View>
+                            </Animated.View>
                           </TouchableWithoutFeedback>
                         </Animated.View>
                     }

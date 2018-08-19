@@ -111,12 +111,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 25,
   },
   bodyRight: {
+    color: '#fff',
     fontSize: 17,
     textAlign: 'right',
   },
   containerRight: {
     alignSelf: 'flex-end',
     alignItems: 'flex-end',
+    backgroundColor: '#777',
   },
   body: {
     fontSize: 18,

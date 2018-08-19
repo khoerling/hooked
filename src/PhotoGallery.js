@@ -117,7 +117,7 @@ export default class PhotoGallery extends React.Component {
   render() {
     const { photo, openProgress, isAnimating } = this.state
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: '#222', paddingHorizontal: 5, }}>
         {this.props.renderContent({ onPhotoOpen: this.open })}
         <Transition
           openProgress={openProgress}

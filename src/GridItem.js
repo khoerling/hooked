@@ -9,20 +9,16 @@ const Item = class Item extends React.Component {
     scale: new Animated.Value(0),
   }
   componentWillMount() {
-    bus.addListener('storySelected', _ => {
-      // build-out titles, yield to animations...
-      setTimeout(_ => this.state.opacity.setValue(0), 250)
-    })
     bus.addListener('photoGalleryClosed', _ => {
       // build-in titles
       setTimeout(_ => {
         Animated.timing(this.state.opacity, {
           toValue: 1,
-          duration: 250,
+          duration: 400,
           easing: Easing.easeOutExpo,
           useNativeDriver: true
         }).start()
-      }, 100)
+      }, 250)
     })
   }
 
@@ -31,34 +27,47 @@ const Item = class Item extends React.Component {
       { item, onPhotoOpen } = this.props,
       scale = this.state.scale.interpolate({
         inputRange: [0, 0.00001, 0.8, 1],
-        outputRange: [1, .96, 1.03, 1],
+        outputRange: [1, .99, 1.016, 1],
       })
-    return (<TouchableHighlight onPress={() => {
-      Animated.timing(this.state.scale, {
-        toValue: 1,
-        duration: 150,
-        easing: Easing.easeInExpo,
-        useNativeDriver: true
-      }).start(_ => this.state.scale.setValue(0))
-      onPhotoOpen(item)}}>
+    return (
       <Animated.View style={{transform: [{scale}]}}>
-        <PhotoGallery.Photo
-          photo={item}
+        <TouchableHighlight
           style={{
-            width: item.width,
-            height: item.height
+            borderRadius: 4,
+            shadowOffset:{  width: 1,  height: 1,  },
+            shadowColor: '#111',
+            overflow: 'hidden',
+            shadowOpacity: .8,
+            elevation: 1,
           }}
-        />
-        <Animated.View style={[styles.container, {opacity: this.state.opacity}]}>
-          <LinearGradient colors={['transparent', 'rgba(0,0,0,.2)', 'rgba(0,0,0,.7)', 'rgba(0,0,0,.99)']} style={styles.gradient}>
-            <View>
-              <Text style={styles.h1}>{item.title}</Text>
-              <Text style={styles.h2}>{item.genre.toUpperCase()}</Text>
-            </View>
-          </LinearGradient>
-        </Animated.View>
-      </Animated.View>
-    </TouchableHighlight>)
+          onPress={() => {
+            this.state.opacity.setValue(0)
+            Animated.timing(this.state.scale, {
+              toValue: 1,
+              duration: 75,
+              easing: Easing.easeInExpo,
+              useNativeDriver: true
+            }).start(_ => this.state.scale.setValue(0))
+          onPhotoOpen(item)}}>
+          <View>
+          <PhotoGallery.Photo
+            photo={item}
+            style={{
+              width: item.width - 5,
+              height: item.height
+            }}
+            />
+          <Animated.View style={[styles.container, {opacity: this.state.opacity}]}>
+            <LinearGradient colors={['transparent', 'rgba(0,0,0,.2)', 'rgba(0,0,0,.7)', 'rgba(0,0,0,.99)']} style={styles.gradient}>
+              <View style={{flex: 1}}>
+                <Text style={styles.h1}>{item.title}</Text>
+                <Text style={styles.h2}>{item.genre.toUpperCase()}</Text>
+              </View>
+            </LinearGradient>
+          </Animated.View>
+          </View>
+        </TouchableHighlight>
+      </Animated.View>)
   }
 }
 
