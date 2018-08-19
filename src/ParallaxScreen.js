@@ -21,7 +21,8 @@ const
 
 export default class App extends React.Component {
   _shouldRender = true
-  animationTimeout = 100
+  _closed = false
+  animationTimeout = 300
   swipeAnimatedValue = new Animated.Value(0)
   state = {
     buildInLastMessage: new Animated.Value(1),
@@ -69,7 +70,13 @@ export default class App extends React.Component {
   }
 
   async componentWillMount() {
-    bus.addListener('photoGalleryClosed', _ => setTimeout(_ => this.closeDrawer(), this.animationTimeout))
+    bus.addListener('photoGalleryClosed', _ => {
+      this._closed = true
+      setTimeout(_ => {
+        this.closeDrawer()
+        this._closed = false
+      }, this.animationTimeout)
+    })
     bus.addListener('storySelected', async ([story, fn]) => {
       if (!this._shouldRender) return // guard
       const
@@ -135,6 +142,10 @@ export default class App extends React.Component {
       setTimeout(_ => {
         // update index and bounce bottom-drawer teaser in
         this.setState({scrollToIndex}, _ => {
+          if (this._closed) {
+            this.state.translateY = new Animated.Value(0)
+            return // guard
+          }
           this._shouldRender = false
           bus.emit('storySelected', [this.story(scrollToIndex), null])
           if (this._timer) clearTimeout(this._timer)
@@ -167,14 +178,14 @@ export default class App extends React.Component {
     const
       story = this.story(),
       messages =
-            []
-            .concat({from: 'narration'})
-            .concat({from: 'narration'})
-            .concat(
-              story
-                .messages
-                .slice(0, this.state.messageIndex)
-                .reverse())
+        []
+        .concat({from: 'narration'})
+        .concat({from: 'narration'})
+        .concat(
+          story
+            .messages
+            .slice(0, this.state.messageIndex)
+            .reverse())
     return (
       <View style={{flex: 1}}>
         <ParallaxSwiper
