@@ -110,7 +110,7 @@ export default class App extends React.Component {
     } else {
       this._close= setTimeout(_ =>
         this.setState({isOnTop: false}, this._drawer.close()),
-        this.animationTimeout)
+        this.animationTimeout * 3)
     }
     global.scrollDrawerBottom()
   }
