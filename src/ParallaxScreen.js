@@ -1,6 +1,6 @@
 import React from 'react'
 import Drawer from 'react-native-bottom-drawer'
-import { Easing, StatusBar, Platform, PanResponder, TouchableWithoutFeedback, Animated, StyleSheet, Image, Text, View, Dimensions } from 'react-native'
+import { Easing, Platform, PanResponder, TouchableWithoutFeedback, Animated, StyleSheet, Image, Text, View, Dimensions } from 'react-native'
 import { ParallaxSwiper, ParallaxSwiperPage } from "react-native-parallax-swiper"
 import { Haptic } from 'expo'
 import { LinearGradient } from 'expo'
@@ -99,7 +99,6 @@ export default class App extends React.Component {
     this.setState({isDrawerOpen: true, isOnTop: true})
     if (this._drawer) this._drawer.open()
     if (!isDroid) Haptic.notification(Haptic.NotificationTypes.Success)
-    StatusBar.setHidden(true, false) // hide
     global.scrollDrawerBottom()
   }
 
@@ -114,16 +113,13 @@ export default class App extends React.Component {
         this.animationTimeout)
     }
     global.scrollDrawerBottom()
-    StatusBar.setHidden(false, true) // show
   }
 
   onStartDrag() {
     this.setState({isOnTop: true})
-    StatusBar.setHidden(true, true) // hide & show
   }
   onStopDrag() {
     setTimeout(_ => this.setState({isOnTop: this.state.isDrawerOpen ? true : false}), this.animationTimeout)
-    StatusBar.setHidden(!this.state.isDrawerOpen, false) // hide & show
   }
 
   onScrollBegin(scrollToIndex) {

@@ -1,5 +1,5 @@
 import React, { Component, PureComponent } from 'react'
-import { Platform, TouchableWithoutFeedback, Animated, StyleSheet, Image, Text, ListView, View, Dimensions } from 'react-native'
+import { StatusBar, Platform, TouchableWithoutFeedback, Animated, StyleSheet, Image, Text, ListView, View, Dimensions } from 'react-native'
 
 import ParallaxScreen from './src/ParallaxScreen'
 import PHOTOS from './src/data'
@@ -76,6 +76,7 @@ export default class App extends Component {
     }
     return (
       <View style={{flex: 1, backgroundColor: '#000'}}>
+        <StatusBar hidden={true} />
         <PhotoGallery
           renderContent={({ onPhotoOpen }) =>
             <ListView
