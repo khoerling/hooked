@@ -76,7 +76,7 @@ export default class App extends Component {
     }
     return (
       <View style={{flex: 1, backgroundColor: '#000'}}>
-        <StatusBar hidden={true} />
+        <StatusBar barStyle={'dark-content'} hidden={false} />
         <PhotoGallery
           renderContent={({ onPhotoOpen }) =>
             <ListView

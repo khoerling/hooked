@@ -1,5 +1,5 @@
 import React from 'react'
-import { Animated, Easing, StyleSheet, Text, View, TouchableHighlight, TouchableWithoutFeedback } from 'react-native'
+import { StatusBar, Animated, Easing, StyleSheet, Text, View, TouchableHighlight, TouchableWithoutFeedback } from 'react-native'
 import PhotoGallery from './PhotoGallery'
 import { LinearGradient } from 'expo'
 
@@ -17,7 +17,7 @@ const Item = class Item extends React.Component {
           duration: 400,
           easing: Easing.easeOutExpo,
           useNativeDriver: true
-        }).start()
+        }).start(_ => StatusBar.setHidden(false, true)) // show
       }, 250)
     })
   }
@@ -47,7 +47,10 @@ const Item = class Item extends React.Component {
               duration: 75,
               easing: Easing.easeInExpo,
               useNativeDriver: true
-            }).start(_ => this.state.scale.setValue(0))
+            }).start(_ => {
+              this.state.scale.setValue(0)
+              StatusBar.setHidden(true, false) // hide
+            })
           onPhotoOpen(item)}}>
           <View>
           <PhotoGallery.Photo
