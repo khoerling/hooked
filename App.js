@@ -1,7 +1,6 @@
 import React, { Component, PureComponent } from 'react'
 import { StatusBar, Platform, TouchableWithoutFeedback, Animated, StyleSheet, Image, Text, ListView, View, Dimensions } from 'react-native'
 
-import ParallaxScreen from './src/ParallaxScreen'
 import PHOTOS from './src/data'
 import { processImages, buildRows, normalizeRows } from './src/utils'
 import PhotoGallery from './src/PhotoGallery'

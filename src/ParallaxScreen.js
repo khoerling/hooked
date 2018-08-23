@@ -98,6 +98,7 @@ export default class App extends React.Component {
         }).start()
       })
     })
+    this.setState({messageIndex: await this.messageIndex(this.state.scrollToIndex)})
   }
 
   openDrawer() {
