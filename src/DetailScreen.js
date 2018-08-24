@@ -1,5 +1,4 @@
 import React from 'react'
-
 import {
   StyleSheet,
   Text,
@@ -109,8 +108,8 @@ const styles = StyleSheet.create({
   },
   body: { flex: 1, },
   closeButton: {
-    marginTop: 10,
-    marginRight: -26,
+    marginTop: -23,
+    marginRight: -20,
   },
   image: {
     height: 60,
