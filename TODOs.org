@@ -1,0 +1,11 @@
+* massive overhaul:  improving open/close animations & bug-fixes, etc...
+  087ecb6 master re-adds StatusBar
+  19271be adds slatherings of ui butter  :sparkles:
+  0b2d6c2 fix: wait for drawer-close animation/fx to finish
+  e008f8b hide StatusBar
+  ed10ea4 fix: fx timing, weird ui states, etc...
+  :LOGBOOK:
+  CLOCK: [2018-08-22 Wed 21:24]--[2018-08-22 Wed 23:46] =>  2:22
+  CLOCK: [2018-08-19 Sun 21:32]--[2018-08-19 Sun 22:43] =>  1:01
+  CLOCK: [2018-08-19 Sun 12:01]--[2018-08-19 Sun 16:03] =>  4:02
+  :END:
