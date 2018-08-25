@@ -114,6 +114,7 @@ export default class App extends React.Component {
   }
 
   closeDrawer() {
+    bus.emit('closeDrawer', true)
     this.setState(
       {isDrawerOpen: false},
       _ => this.state.storyOpacity.setValue(1))
@@ -193,8 +194,7 @@ export default class App extends React.Component {
         .concat(
           story
             .messages
-            .slice(0, this.state.messageIndex)
-            .reverse())
+            .slice(0, this.state.messageIndex))
     return (
       <View style={{flex: 1}}>
         <ParallaxSwiper
@@ -273,11 +273,12 @@ export default class App extends React.Component {
             data={messages}
             renderItem={
               ({index, item, separators}) => <Message
+                key={index}
                 item={item}
                 index={index}
                 style={this.isLastMessage(item, index) ? {transform: [{scale: this.state.buildInLastMessage}]} : null}
                 theme={story.theme}
-              onPress={_ => this.onPress({animated: true})} />}
+                onPress={_ => this.onPress({animated: true})} />}
                 header={''} />
         </Animated.View>
       </View>

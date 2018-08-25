@@ -9,3 +9,9 @@
   CLOCK: [2018-08-19 Sun 21:32]--[2018-08-19 Sun 22:43] =>  1:01
   CLOCK: [2018-08-19 Sun 12:01]--[2018-08-19 Sun 16:03] =>  4:02
   :END:
+* drawer overhaul
+** auto scroll-down working
+   :LOGBOOK:
+   CLOCK: [2018-08-24 Fri 21:08]--[2018-08-24 Fri 23:52] =>  2:44
+   :END:
+** move close buttons to header

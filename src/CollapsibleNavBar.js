@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  TouchableWithoutFeedback,
   View,
   StyleSheet,
   Text,
@@ -130,13 +131,31 @@ class CollapsibleNavBar extends React.Component {
     });
   }
 
+  componentWillMount() {
+    bus.addListener('closeDrawer', _ => {
+      this.scrollView.getNode().scrollTo({y: 0, animated: false})
+    })
+  }
+
+  componentWillUnmount() {
+    bus.removeEventListener('closeDrawer')
+  }
+
+  onPress() {
+    this.scrollView.getNode().scrollToEnd({animated: false})
+    this.props.onPress()
+  }
+
   render() {
     return (
-      <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={_ => this.onPress()}>
+        <View style={styles.contentContainerStyle}>
         <Animated.ScrollView
+          ref={r => this.scrollView = r}
+          keyboardShouldPersistTaps={'always'}
           style={styles.scrollView}
           contentContainerStyle={styles.scrollViewContent}
-          scrollEventThrottle={1}
+          scrollEventThrottle={16}
           onScroll={event(
             [
               {
@@ -162,7 +181,10 @@ class CollapsibleNavBar extends React.Component {
             { useNativeDriver: true },
           )}
         >
-          {this.props.children}
+          {this.props.data.map((item, index) => this.props.renderItem({item, index, onPress: _ => this.onPress()}))}
+          <View onLayout={(e)=> {
+              this.footerY = e.nativeEvent.layout.y;
+            }}/>
         </Animated.ScrollView>
         <Animated.View
           style={[
@@ -182,7 +204,8 @@ class CollapsibleNavBar extends React.Component {
             Navigation Bar
           </Animated.Text>
         </Animated.View>
-      </View>
+        </View>
+      </TouchableWithoutFeedback>
     );
   }
 }
