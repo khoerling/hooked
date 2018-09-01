@@ -8,18 +8,23 @@ const Item = class Item extends React.Component {
     opacity: new Animated.Value(1),
     scale: new Animated.Value(0),
   }
+
+  buildInTitles = _ => {
+    Animated.timing(this.state.opacity, {
+      toValue: 1,
+      duration: 500,
+      easing: Easing.easeOutExpo,
+      useNativeDriver: true
+    }).start()
+    StatusBar.setHidden(false, true) // show
+  }
+
   componentWillMount() {
-    bus.addListener('photoGalleryClosed', _ => {
-      // build-in titles
-      setTimeout(_ => {
-        Animated.timing(this.state.opacity, {
-          toValue: 1,
-          duration: 400,
-          easing: Easing.easeOutExpo,
-          useNativeDriver: true
-        }).start(_ => StatusBar.setHidden(false, true)) // show
-      }, 250)
-    })
+    bus.addListener('photoGalleryClosed', this.buildInTitles)
+  }
+
+  componentWillUnmount() {
+    bus.removeListener('photoGalleryClosed', this.buildInTitles)
   }
 
   render() {
@@ -41,17 +46,10 @@ const Item = class Item extends React.Component {
             elevation: 1,
           }}
           onPress={() => {
+            onPhotoOpen(item)
             this.state.opacity.setValue(0)
-            Animated.timing(this.state.scale, {
-              toValue: 1,
-              duration: 75,
-              easing: Easing.easeInExpo,
-              useNativeDriver: true
-            }).start(_ => {
-              this.state.scale.setValue(0)
-              StatusBar.setHidden(true, false) // hide
-            })
-          onPhotoOpen(item)}}>
+            StatusBar.setHidden(true, false) // hide
+          }}>
           <View>
           <PhotoGallery.Photo
             photo={item}

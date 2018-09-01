@@ -8,18 +8,21 @@ import {
   View,
   ViewPropTypes,
   Platform,
+  Dimensions,
 } from 'react-native'
 
-const isDroid = Platform.OS !== 'ios'
+const
+  isDroid = Platform.OS !== 'ios',
+  screen = Dimensions.get('window')
 
 export default class Message extends React.Component {
   render() {
     const {item, theme, style, onPress} = this.props
     if (!item) return <View style={{height: 20}}></View> // guard
     return (
-      <TouchableWithoutFeedback onPress={_ => onPress()}>
+      <TouchableWithoutFeedback onPress={_ => onPress()} style={{flex: 1, backgroundColor: 'red', width: screen.width}}>
         {item.from === 'narration'
-          ? <Animated.View style={[{flex: 1, marginHorizontal: 30, justifyContent: 'center'}, style ? style : null]}>
+          ? <Animated.View style={[{flex: 1, paddingHorizontal: 30, justifyContent: 'center'}, style ? style : null]}>
               <Text
                 selectable={true}
                 style={[
@@ -36,6 +39,7 @@ export default class Message extends React.Component {
               item.abstract ? styles.abstract : null,
               theme ? styles[`${theme}Container`] : null,
               item.abstract ? styles[`${theme}Abstract`] : null]}>
+            <View style={styles.content}>
               {item.adjacent
                 ? null
                 : item.from
@@ -58,6 +62,7 @@ export default class Message extends React.Component {
                   item.abstract ? styles[`${theme || ''}AbstractText`] : null]}>
                   {item.msg || item.abstract}
               </Text>
+            </View>
             </Animated.View>
         }
       </TouchableWithoutFeedback>
@@ -67,6 +72,8 @@ export default class Message extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    width: screen.width,
     borderRadius: 10,
     backgroundColor: 'rgba(255,255,255,.94)',
     padding: 8,
@@ -74,6 +81,8 @@ const styles = StyleSheet.create({
     paddingRight: 20,
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
+  },
+  content: {
     marginTop: 10,
     marginHorizontal: 5,
     maxWidth: '75%',
@@ -116,6 +125,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   containerRight: {
+    flex: 1,
     alignSelf: 'flex-end',
     alignItems: 'flex-end',
     backgroundColor: '#777',

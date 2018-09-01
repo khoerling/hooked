@@ -10,7 +10,7 @@ import {
   Animated
 } from 'react-native'
 
-import ParallaxScreen from './ParallaxScreen'
+import Screen from './Screen'
 import PHOTOS from './data'
 
 const maxWidth = Dimensions.get('window').width
@@ -18,20 +18,34 @@ const maxWidth = Dimensions.get('window').width
 export default class DetailScreen extends React.Component {
   state = {
     localPhoto: null,
-    scrollToIndex: 0,
+    story: 0,
+    isDrawerOpen: false,
   }
 
   componentWillReceiveProps(nextProps) {
     const { photo } = nextProps
     if (photo) {
-      const scrollToIndex = PHOTOS.findIndex(p => p.id === photo.id)
-      this.setState({ localPhoto: photo, scrollToIndex })
+      const story = PHOTOS.find(p => p.id === photo.id)
+      this.setState({ localPhoto: photo, story })
     }
+  }
+
+  onOpenedDrawer = _ => {
+    this.setState({isDrawerOpen: true})
+  }
+
+  onClosedDrawer = _ => {
+    this.setState({isDrawerOpen: false})
+  }
+
+  componentWillMount() {
+    bus.addListener('openedDrawer', this.onOpenedDrawer)
+    bus.addListener('closedDrawer', this.onClosedDrawer)
   }
 
   render() {
     const { onClose, openProgress, isAnimating } = this.props
-    const { localPhoto } = this.state
+    const { localPhoto, story } = this.state
     if (localPhoto) {
       return (
         <Animated.View
@@ -68,27 +82,30 @@ export default class DetailScreen extends React.Component {
               }
             ]}
           >
-            <ParallaxScreen scrollToIndex={this.state.scrollToIndex} />
+            <Screen story={story} />
           </Animated.View>
-          <Animated.View
-            style={{
-              position: 'absolute',
-              top: 16,
-              right: 20,
-              opacity: openProgress
-            }}
-            pointerEvents={isAnimating ? 'none' : 'auto'}
-          >
-            <TouchableOpacity
-              hitSlop={{ top: 20, left: 20, right: 20, bottom: 20 }}
-              onPress={() => onClose(localPhoto.id, this.state.scrollToIndex)}
-              style={styles.closeButton}
-            >
-              <View>
-                <Image style={styles.image} source={require('../assets/x.png')} />
-              </View>
-            </TouchableOpacity>
-          </Animated.View>
+          {this.state.isDrawerOpen
+            ? null
+            : <Animated.View
+                style={{
+                  position: 'absolute',
+                  top: 16,
+                  right: 20,
+                  opacity: openProgress
+                }}
+                pointerEvents={isAnimating ? 'none' : 'auto'}
+              >
+                <TouchableOpacity
+                  hitSlop={{ top: 20, left: 20, right: 20, bottom: 20 }}
+                  onPress={() => onClose(localPhoto.id, story)}
+                  style={styles.closeButton}
+                >
+                  <View>
+                    <Image style={styles.image} source={require('../assets/x.png')} />
+                  </View>
+                </TouchableOpacity>
+              </Animated.View>
+          }
         </Animated.View>
       )
     }
@@ -108,7 +125,7 @@ const styles = StyleSheet.create({
   },
   body: { flex: 1, },
   closeButton: {
-    marginTop: -23,
+    marginTop: -10,
     marginRight: -20,
   },
   image: {

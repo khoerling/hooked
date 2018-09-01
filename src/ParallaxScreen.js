@@ -33,32 +33,6 @@ export default class App extends React.Component {
     messageIndex: 1,
   }
 
-  getPageTransformStyle = index => ({
-    transform: [
-      {
-        scale: this.swipeAnimatedValue.interpolate({
-          inputRange: [
-            (index - 1) * (width + 8), // Add 8 for dividerWidth
-            index * (width + 8),
-            (index + 1) * (width + 8)
-          ],
-          outputRange: [-.8, 1, -.8],
-          extrapolate: "clamp"
-        })
-      },
-      {
-        rotate: this.swipeAnimatedValue.interpolate({
-          inputRange: [
-            (index - 1) * (width + 8),
-            index * (width + 8),
-            (index + 1) * (width + 8)
-          ],
-          outputRange: ["80deg", "0deg", "-80deg"],
-          extrapolate: "clamp"
-        })
-      }
-    ]
-  })
 
   story = s => data[s || this.state.scrollToIndex]
   saveMessageIndex = _ => set(`msgs:${this.state.scrollToIndex}`, this.state.messageIndex)
@@ -89,15 +63,16 @@ export default class App extends React.Component {
         scrollToIndex,
         messageIndex: await this.messageIndex(scrollToIndex),
       }, _ => {
-        cb()
+        // cb()
         Animated.timing(this.state.storyOpacity, {
           useNativeDriver: true,
           easing: Easing.easeOutCubic,
           toValue: 1,
-          duration: 250,
+          duration: 125,
         }).start()
       })
     })
+    // load initial index
     this.setState({messageIndex: await this.messageIndex(this.state.scrollToIndex)})
   }
 
@@ -107,14 +82,17 @@ export default class App extends React.Component {
       clearTimeout(this._close)
       this._close = null
     }
-    this.setState({isDrawerOpen: true, isOnTop: true})
-    if (this._drawer) this._drawer.open()
-    if (!isDroid) Haptic.notification(Haptic.NotificationTypes.Success)
-    global.scrollDrawerBottom()
+    if (this.state.isDrawerOpen) return // guard
+    this.setState({isDrawerOpen: true, isOnTop: true}, _ => {
+      // if (this._drawer) this._drawer.open()
+      if (!isDroid) Haptic.notification(Haptic.NotificationTypes.Success)
+      global.scrollDrawerBottom()
+      bus.emit('openedDrawer')
+    })
   }
 
   closeDrawer() {
-    bus.emit('closeDrawer', true)
+    bus.emit('closedDrawer', true)
     this.setState(
       {isDrawerOpen: false},
       _ => this.state.storyOpacity.setValue(1))
@@ -126,15 +104,18 @@ export default class App extends React.Component {
         this.setState({isOnTop: false}, this._drawer.close()),
         this.animationTimeout * 3)
     }
-    global.scrollDrawerBottom()
   }
 
   onStartDrag() {
     this.setState({isOnTop: true})
   }
-  onStopDrag() {
-    setTimeout(_ => this.setState({isOnTop: this.state.isDrawerOpen ? true : false}), this.animationTimeout)
-  }
+  // onStopDrag() {
+  //   if (this.state.isDrawerOpen) {
+  //     bus.emit('openedDrawer')
+  //   } else {
+  //     bus.emit('closedDrawer')
+  //   }
+  // }
 
   onScrollBegin(scrollToIndex) {
     if (this._endTimer) clearTimeout(this._endTimer)
@@ -170,14 +151,13 @@ export default class App extends React.Component {
     if (!this.state.isDrawerOpen) {
       this.openDrawer()
     } else {
-      if (this.state.isDrawerOpen) setTimeout(_ => global.scrollDrawerBottom({animated: true}), 150)
       this.setState({messageIndex: this.state.messageIndex + 1}, _ => {
-        if (params && params.animated)
-          Animated.spring(this.state.buildInLastMessage, {
-            toValue: 1,
-            velocity: 1.5,
-            bounciness: .1,
-          }).start()
+        // if (params && params.animated)
+        //   Animated.spring(this.state.buildInLastMessage, {
+        //     toValue: 1,
+        //     velocity: 1.5,
+        //     bounciness: .1,
+        //   }).start()
         if (!isDroid) Haptic.selection()
         this.saveMessageIndex()
       })
@@ -195,48 +175,16 @@ export default class App extends React.Component {
           story
             .messages
             .slice(0, this.state.messageIndex))
+    // return (<View style={{flex: 1, backgroundColor: 'blue'}}/>)
     return (
       <View style={{flex: 1}}>
-        <ParallaxSwiper
-          speed={0.2}
-          animatedValue={this.swipeAnimatedValue}
-          dividerWidth={8}
-          dividerColor="black"
-          backgroundColor="black"
-          onMomentumScrollEnd={i => this.onScrollEnd(i)}
-          onScrollBeginDrag={i => this.onScrollBegin(i)}
-          showsHorizontalScrollIndicator={false}
-          progressBarThickness={0}
-          showProgressBar={false}
-          scrollToIndex={this.state.scrollToIndex}
-          progressBarBackgroundColor="rgba(0,0,0,0.25)"
-          progressBarValueBackgroundColor="#000">
-          {data.map((story, ndx) =>
-            (
-              <ParallaxSwiperPage key={story.id + 'page'}
-                BackgroundComponent={
                   <Image
                     style={styles.backgroundImage}
                     source={{ uri: story.source.uri }} />
-                }
-                ForegroundComponent={
                   <LinearGradient colors={gradients[story.theme || 'light']} style={[styles.foregroundTextContainer, {opacity: this.state.isDrawerOpen ? 0 : 1}]}>
                     {this.state.isDrawerOpen
                       ? null
-                      : <Animated.View
-                          style={[
-                            this.getPageTransformStyle(ndx),
-                            {
-                              opacity: this.swipeAnimatedValue.interpolate({
-                                inputRange: [
-                                  (ndx - 1) * (width + 8), // Add 8 for dividerWidth
-                                  ndx * (width + 8),
-                                  (ndx + 1) * (width + 8)
-                                ],
-                                outputRange: [-2, 1, -2],
-                              }),
-                            },
-                          ]}>
+                      : <View>
                           <TouchableWithoutFeedback onPress={_ => this.openDrawer()}>
                             <Animated.View style={{opacity: this.state.storyOpacity}}>
                               <Text style={[styles.foregroundText, story.theme ? styles[story.theme] : null]}>{story.title.toUpperCase()}</Text>
@@ -244,13 +192,9 @@ export default class App extends React.Component {
                               <Text style={[styles.abstractText, story.theme ? styles[story.theme] : null]}>{story.abstract}</Text>
                             </Animated.View>
                           </TouchableWithoutFeedback>
-                        </Animated.View>
+                        </View>
                     }
                   </LinearGradient>
-                }
-              />
-            ))}
-          </ParallaxSwiper>
         <Animated.View
           style={[
             {transform: [{translateY: this.state.translateY}]},
@@ -262,10 +206,9 @@ export default class App extends React.Component {
             onPress={_ => this.onPress()}
             ref={r => this._drawer = r}
             inverted={this.state.isDrawerOpen}
-            onOpen={_ => this.setState({isDrawerOpen: true})}
+            onOpen={_ => this.openDrawer()}
             onClose={_ => this.closeDrawer()}
             onStartDrag={_ => this.onStartDrag()}
-            onStopDrag={_ => this.onStopDrag()}
             headerHeight={0}
             teaserHeight={135}
             itemHeight={130}

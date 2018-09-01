@@ -93,6 +93,9 @@ class CollapsibleNavBar extends React.Component {
     this.scrollY = new Value(0);
     this.scrollEndDragVelocity = new Value(DRAG_END_INITIAL);
     this.snapOffset = new Value(0);
+    this.state = {
+      isOpen: false,
+    }
 
     const diffClampNode = diffClamp(
       add(this.scrollY, this.snapOffset),
@@ -131,19 +134,33 @@ class CollapsibleNavBar extends React.Component {
     });
   }
 
+  scrollDrawerBottom(params={animated: false}) {
+    this.scrollView.getNode().scrollToEnd(params)
+  }
+
+  scrollDrawerTop() {
+    this.scrollView.getNode().scrollTo({y: 0, animated: false})
+  }
+
   componentWillMount() {
-    bus.addListener('closeDrawer', _ => {
-      this.scrollView.getNode().scrollTo({y: 0, animated: false})
+    global.scrollDrawerBottom = params => this.scrollDrawerBottom(params)
+    global.scrollDrawerTop = params => this.scrollDrawerTop(params)
+    bus.addListener('openedDrawer', _ => {
+      this.setState({isOpen: true})
+    })
+    bus.addListener('closedDrawer', _ => {
+      this.setState({isOpen: false}, _ => this.scrollDrawerTop())
     })
   }
 
   componentWillUnmount() {
-    bus.removeEventListener('closeDrawer')
+    bus.removeEventListener('closedDrawer')
+    bus.removeEventListener('openedDrawer')
   }
 
   onPress() {
-    this.scrollView.getNode().scrollToEnd({animated: false})
     this.props.onPress()
+    this.scrollDrawerBottom()
   }
 
   render() {
@@ -181,7 +198,9 @@ class CollapsibleNavBar extends React.Component {
             { useNativeDriver: true },
           )}
         >
-          {this.props.data.map((item, index) => this.props.renderItem({item, index, onPress: _ => this.onPress()}))}
+          {this.props.data.map(
+            (item, index) =>
+              this.props.renderItem({item, index, onPress: _ => this.onPress()}))}
           <View onLayout={(e)=> {
               this.footerY = e.nativeEvent.layout.y;
             }}/>
@@ -190,6 +209,7 @@ class CollapsibleNavBar extends React.Component {
           style={[
             styles.navBar,
             {
+              opacity: this.state.isOpen ? 1 : 0,
               transform: [
                 {
                   translateY: this.animatedNavBarTranslateY,
@@ -238,10 +258,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scrollView: {
-    marginTop: Platform.OS === 'ios' ? STATUS_BAR_HEIGHT : 0,
     backgroundColor: 'transparent',
   },
   scrollViewContent: {
-    paddingTop: NAV_BAR_HEIGHT,
   },
 });

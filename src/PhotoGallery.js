@@ -44,7 +44,7 @@ class PhotoGalleryPhoto extends React.Component {
 export default class PhotoGallery extends React.Component {
   static Photo = PhotoGalleryPhoto
 
-  initialLoad = true
+  // initialLoad = true
   state = {
     photo: null,
     openProgress: new Animated.Value(0),
@@ -61,7 +61,7 @@ export default class PhotoGallery extends React.Component {
 
   componentWillMount() {
     bus.addListener('storySelected', ([photo, cb]) => {
-      this.setState({photo})
+      this.setState({photo}, cb)
     })
   }
   getChildContext() {
@@ -74,29 +74,23 @@ export default class PhotoGallery extends React.Component {
   }
 
   open = photo => {
-    const openFn = _ => {
-      this._imageOpacitySetters[photo.id](
-        this.state.openProgress.interpolate({
-          inputRange: [0.005, 0.9],
-          outputRange: [1, 0]
-        })
-      )
-      this.setState({ photo, isAnimating: true }, () => {
-        Animated.timing(this.state.openProgress, {
-          toValue: 1,
-          duration: 150,
-          useNativeDriver: true
-        }).start(() => {
-          this.setState({ isAnimating: false })
-        })
-      })
-    }
-    if (this.initialLoad) {
-      this.initialLoad = false
-      openFn()
-    }
     if (!isDroid) Haptic.selection() // immediate feedback
-    bus.emit('storySelected', [photo, openFn]) // photo is the full story
+    this._imageOpacitySetters[photo.id](
+      this.state.openProgress.interpolate({
+        inputRange: [0.005, 0.999],
+        outputRange: [1, 0]
+      })
+    )
+    bus.emit('storySelected', [photo, null]) // photo is the full story
+    this.setState({ photo, isAnimating: true }, _ => {
+      Animated.timing(this.state.openProgress, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true
+      }).start(() => {
+        this.setState({ isAnimating: false })
+      })
+    })
   }
 
   close = (photoId, index) => {
@@ -104,7 +98,7 @@ export default class PhotoGallery extends React.Component {
     this.setState({ photo: null, isAnimating: true }, () => {
       Animated.timing(this.state.openProgress, {
         toValue: 0,
-        duration: 300,
+        duration: 250,
         easing: Easing.easeOutCubic,
         useNativeDriver: true
       }).start(() => {
