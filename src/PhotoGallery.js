@@ -81,16 +81,19 @@ export default class PhotoGallery extends React.Component {
         outputRange: [1, 0]
       })
     )
-    bus.emit('storySelected', [photo, null]) // photo is the full story
     this.setState({ photo, isAnimating: true }, _ => {
+      setTimeout(_ => {
       Animated.timing(this.state.openProgress, {
         toValue: 1,
-        duration: 1000,
+        duration: 100,
+        easing: Easing.easeInCubic,
         useNativeDriver: true
       }).start(() => {
         this.setState({ isAnimating: false })
       })
+      }, 250) // FIXME yield to load photo -- use cb, or... ?
     })
+    bus.emit('storySelected', [photo, null]) // photo is the full story
   }
 
   close = (photoId, index) => {
@@ -98,7 +101,7 @@ export default class PhotoGallery extends React.Component {
     this.setState({ photo: null, isAnimating: true }, () => {
       Animated.timing(this.state.openProgress, {
         toValue: 0,
-        duration: 250,
+        duration: 350,
         easing: Easing.easeOutCubic,
         useNativeDriver: true
       }).start(() => {

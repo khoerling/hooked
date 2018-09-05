@@ -19,19 +19,18 @@ const
   }
 
 export default class App extends React.Component {
-  _shouldRender = true
   _closed = false
   animationTimeout = 300
   state = {
-    storyOpacity: new Animated.Value(1),
+    buildIn: new Animated.Value(0),
     buildInLastMessage: new Animated.Value(1),
     translateY: new Animated.Value(0),
     isDrawerOpen: false,
     messageIndex: 1,
   }
 
-  saveMessageIndex = _ => set(`msgs:${this.state.scrollToIndex}`, this.state.messageIndex)
-  messageIndex = async scrollToIndex => (await get(`msgs:${scrollToIndex || this.state.scrollToIndex}`)) || 1
+  saveMessageIndex = _ => set(`msgs:${this.props.story.id}`, this.state.messageIndex)
+  messageIndex = async story => (await get(`msgs:${story.id}`)) || 1
   isLastMessage = (story, index) => index === 2
 
   componentWillUnmount() {
@@ -47,28 +46,23 @@ export default class App extends React.Component {
         this._closed = false
       }, this.animationTimeout)
     })
-    bus.addListener('storySelected', async ([story, fn]) => {
-      if (!this._shouldRender) return // guard
-      this.state.storyOpacity.setValue(0)
-      const
-        scrollToIndex = data.findIndex(d => d.id === story.id),
-        cb = fn || (_ => {})
-      this.setState({
-        // restore read-point & index
-        scrollToIndex,
-        messageIndex: await this.messageIndex(scrollToIndex),
-      }, _ => {
-        // cb()
-        Animated.timing(this.state.storyOpacity, {
-          useNativeDriver: true,
-          easing: Easing.easeOutCubic,
-          toValue: 1,
-          duration: 125,
-        }).start()
-      })
+    bus.addListener('storySelected', async _ => this.buildIn())
+    await this.buildIn() // loads initial index, too
+  }
+
+  async buildIn() {
+    this.state.buildIn.setValue(0)
+    this.setState({
+      // restore read-point & index
+      messageIndex: await this.messageIndex(this.props.story),
+    }, _ => {
+      Animated.timing(this.state.buildIn, {
+        useNativeDriver: true,
+        easing: Easing.easeOutExpo,
+        toValue: 1,
+        duration: 500,
+      }).start()
     })
-    // load initial index
-    this.setState({messageIndex: await this.messageIndex(this.state.scrollToIndex)})
   }
 
   openDrawer() {
@@ -90,7 +84,7 @@ export default class App extends React.Component {
     bus.emit('closedDrawer', true)
     this.setState(
       {isDrawerOpen: false},
-      _ => this.state.storyOpacity.setValue(1))
+      _ => this.state.buildIn.setValue(1))
     if (this._close) { // guard
       clearTimeout(this._close)
       this._close = null
@@ -132,7 +126,12 @@ export default class App extends React.Component {
         .concat(
           story
             .messages
-            .slice(0, this.state.messageIndex))
+            .slice(0, this.state.messageIndex)),
+      moveUp = this.state.buildIn.interpolate({
+        inputRange: [0, .75, 1],
+        outputRange: [0, -3, -4]
+      })
+
     // return (<View style={{flex: 1, backgroundColor: 'blue'}}/>)
     return (
       <View style={{flex: 1}}>
@@ -144,7 +143,7 @@ export default class App extends React.Component {
                       ? null
                       : <View>
                           <TouchableWithoutFeedback onPress={_ => this.openDrawer()}>
-                            <Animated.View style={{opacity: this.state.storyOpacity}}>
+                              <Animated.View style={{transform: [{translateY: moveUp}], opacity: this.state.buildIn}}>
                               <Text style={[styles.foregroundText, story.theme ? styles[story.theme] : null]}>{story.title.toUpperCase()}</Text>
                               <Text style={[styles.authorText, story.theme ? styles[story.theme] : null]}>{story.postedBy.toUpperCase()}</Text>
                               <Text style={[styles.abstractText, story.theme ? styles[story.theme] : null]}>{story.abstract}</Text>
