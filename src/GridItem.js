@@ -46,6 +46,12 @@ const Item = class Item extends React.Component {
             elevation: 1,
           }}
           onPress={() => {
+            Animated.timing(this.state.scale, {
+              toValue: 1,
+              duration: 150,
+              easing: Easing.easeInExpo,
+              useNativeDriver: true
+            }).start(_ => this.state.scale.setValue(0))
             onPhotoOpen(item)
             this.state.opacity.setValue(0)
             StatusBar.setHidden(true, false) // hide

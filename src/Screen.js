@@ -60,7 +60,7 @@ export default class App extends React.Component {
         useNativeDriver: true,
         easing: Easing.easeOutExpo,
         toValue: 1,
-        duration: 500,
+        duration: 700,
       }).start()
     })
   }
