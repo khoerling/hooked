@@ -105,12 +105,12 @@ export default class App extends React.Component {
       this.openDrawer()
     } else {
       this.setState({messageIndex: this.state.messageIndex + 1}, _ => {
-        // if (params && params.animated)
-        //   Animated.spring(this.state.buildInLastMessage, {
-        //     toValue: 1,
-        //     velocity: 1.5,
-        //     bounciness: .1,
-        //   }).start()
+        if (params && params.animated)
+          Animated.spring(this.state.buildInLastMessage, {
+            toValue: 1,
+            velocity: 1.5,
+            bounciness: .1,
+          }).start()
         if (!isDroid) Haptic.selection()
         this.saveMessageIndex()
       })
