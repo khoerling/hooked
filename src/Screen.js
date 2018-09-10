@@ -85,6 +85,7 @@ export default class App extends React.Component {
     this.setState(
       {isDrawerOpen: false},
       _ => this.state.buildIn.setValue(1))
+    global.scrollDrawerBottom()
     if (this._close) { // guard
       clearTimeout(this._close)
       this._close = null
@@ -126,7 +127,10 @@ export default class App extends React.Component {
         .concat(
           story
             .messages
-            .slice(0, this.state.messageIndex)),
+            .slice(0, this.state.messageIndex)
+            .reverse())
+        .concat({from: 'narration'})
+        .concat({from: 'narration'})
       moveUp = this.state.buildIn.interpolate({
         inputRange: [0, .75, 1],
         outputRange: [0, -3, -4]
@@ -167,8 +171,7 @@ export default class App extends React.Component {
             onClose={_ => this.closeDrawer()}
             onStartDrag={_ => this.onStartDrag()}
             headerHeight={0}
-            teaserHeight={135}
-            itemHeight={130}
+            teaserHeight={125}
             headerIcon={'md-arrow-back'}
             data={messages}
             renderItem={
@@ -198,8 +201,9 @@ const styles = StyleSheet.create({
   headerIcon: {
     flex: 1,
     alignSelf: 'center',
-    paddingTop: 30,
+    paddingTop: 20,
     marginVertical: 20,
+    marginBottom: 20,
   },
   foregroundTextContainer: {
     flex: 1,

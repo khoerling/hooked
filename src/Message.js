@@ -20,7 +20,7 @@ export default class Message extends React.Component {
     const {item, theme, style, onPress} = this.props
     if (!item) return <View style={{height: 20}}></View> // guard
     return (
-      <TouchableWithoutFeedback onPress={_ => onPress()} style={{flex: 1, backgroundColor: 'red', width: screen.width}}>
+      <TouchableWithoutFeedback onPress={_ => onPress()}>
         {item.from === 'narration'
           ? <Animated.View style={[{flex: 1, paddingHorizontal: 30, justifyContent: 'center'}, style ? style : null]}>
               <Text
@@ -33,13 +33,15 @@ export default class Message extends React.Component {
             </Animated.View>
           : <Animated.View style={[
               styles.container,
-              item.adjacent ? styles.adjacent : null,
               item.right ? styles.containerRight : null,
               style ? style : null,
-              item.abstract ? styles.abstract : null,
-              theme ? styles[`${theme}Container`] : null,
-              item.abstract ? styles[`${theme}Abstract`] : null]}>
-            <View style={styles.content}>
+            ]}>
+            <View style={[
+              styles.content,
+              item.adjacent ? styles.adjacent : null,
+              item.right ? styles.contentRight : null,
+              theme ? styles[`${theme}Content`] : null,
+            ]}>
               {item.adjacent
                 ? null
                 : item.from
@@ -59,8 +61,8 @@ export default class Message extends React.Component {
                   styles.body,
                   theme ? styles[`${theme || ''}Body`] : null,
                   item.right ? styles.bodyRight : null,
-                  item.abstract ? styles[`${theme || ''}AbstractText`] : null]}>
-                  {item.msg || item.abstract}
+                  ]}>
+                  {item.msg}
               </Text>
             </View>
             </Animated.View>
@@ -74,38 +76,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: screen.width,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,.94)',
-    padding: 8,
-    paddingHorizontal: 15,
-    paddingRight: 20,
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
   },
   content: {
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 7,
+    backgroundColor: 'rgba(255,255,255,.94)',
     marginTop: 10,
-    marginHorizontal: 5,
-    maxWidth: '75%',
-    flex: .7,
-  },
-  abstract: {
-    backgroundColor: 'transparent',
-    minHeight: 90,
-  },
-  darkAbstract: {
-    backgroundColor: 'transparent',
-    minHeight: 90,
-  },
-  darkAbstractText: {
-    fontSize: 16,
-    color: 'rgba(0,0,0,.8)',
-  },
-  AbstractText: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,.8)',
+    marginHorizontal: 10,
+    maxWidth: screen.width * .75,
   },
   adjacent: {
     marginTop: 2,
+    borderRadius: 5,
   },
   darkNarration: {
     color: '#aaa',
@@ -125,15 +110,16 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   containerRight: {
-    flex: 1,
     alignSelf: 'flex-end',
     alignItems: 'flex-end',
+  },
+  contentRight: {
     backgroundColor: '#777',
   },
   body: {
     fontSize: 18,
   },
-  darkContainer: {
+  darkContent: {
     backgroundColor: 'rgba(50,50,50,.94)',
   },
   darkBody: {
