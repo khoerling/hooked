@@ -72,9 +72,9 @@ export default class App extends React.Component {
       this._close = null
     }
     if (this.state.isDrawerOpen) return // guard
+    if (!isDroid) Haptic.notification(Haptic.NotificationTypes.Success)
     this.setState({isDrawerOpen: true, isOnTop: true}, _ => {
-      // if (this._drawer) this._drawer.open()
-      if (!isDroid) Haptic.notification(Haptic.NotificationTypes.Success)
+      if (this._drawer) this._drawer.open()
       global.scrollDrawerBottom()
       bus.emit('openedDrawer')
     })
