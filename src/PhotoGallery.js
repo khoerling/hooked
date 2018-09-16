@@ -101,7 +101,7 @@ export default class PhotoGallery extends React.Component {
     this.setState({ photo: null, isAnimating: true }, () => {
       Animated.timing(this.state.openProgress, {
         toValue: 0,
-        duration: 350,
+        duration: 175,
         easing: Easing.easeOutCubic,
         useNativeDriver: true
       }).start(() => {

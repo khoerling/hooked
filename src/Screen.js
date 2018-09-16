@@ -1,6 +1,6 @@
 import React from 'react'
 import Drawer from 'react-native-bottom-drawer'
-import { Easing, Platform, PanResponder, TouchableWithoutFeedback, Animated, StyleSheet, Image, Text, View, Dimensions } from 'react-native'
+import { Easing, Platform, PanResponder, TouchableOpacity, TouchableWithoutFeedback, Animated, StyleSheet, Image, Text, View, Dimensions } from 'react-native'
 import { Haptic } from 'expo'
 import { LinearGradient } from 'expo'
 
@@ -108,8 +108,8 @@ export default class App extends React.Component {
         if (params && params.animated)
           Animated.spring(this.state.buildInLastMessage, {
             toValue: 1,
-            velocity: 1.5,
-            bounciness: .1,
+            velocity: 1.3,
+            bounciness: .08,
           }).start()
         if (!isDroid) Haptic.selection()
         this.saveMessageIndex()
@@ -182,6 +182,19 @@ export default class App extends React.Component {
                 style={this.isLastMessage(item, index) ? {transform: [{scale: this.state.buildInLastMessage}]} : null}
                 theme={story.theme}
                 onPress={_ => this.onPress({animated: true})} />}
+                HeaderComponent={props =>
+                  <View>
+                    <Text numberOfLines={1} style={styles.headerTitle}>{this.props.story.title}</Text>
+                    <TouchableOpacity
+                      hitSlop={{ top: 20, left: 20, right: 20, bottom: 20 }}
+                      onPress={_ => this.setState({isOnTop: false}, this._drawer.close())}
+                      style={styles.closeButton}>
+                      <View>
+                        <Image style={styles.image} source={require('../assets/x.png')} />
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                }
                 header={''} />
         </Animated.View>
       </View>
@@ -193,6 +206,29 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  headerTitle: {
+    fontFamily: 'iowan',
+    paddingHorizontal: 12,
+    flex: 1,
+    flexDirection: 'row',
+    fontSize: 24,
+    paddingRight: 50,
+    fontWeight: "700",
+    letterSpacing: 0.41,
+    color: '#333',
+    position: 'absolute',
+    left: 0,
+    top: 15,
+  },
+  closeButton: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  image: {
+    height: 60,
+    width: 60,
   },
   backgroundImage: {
     width,
