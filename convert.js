@@ -28,7 +28,7 @@ process.argv.forEach((val, index, array) => {
         // @ new line, so-- push msg
         done = true
         key = key + 1
-        messages.push({
+        if (msg && msg.length) messages.push({
           key,
           adjacent,
           from,
